@@ -111,7 +111,11 @@ const SearchResults = () => {
     setIsSendingEmail(true);
 
     try {
-      await sendOutreachEmail(selectedCandidate, emailContent);
+      await sendOutreachEmail(
+        selectedCandidate,
+        emailContent,
+        user?.email || ""
+      );
     } catch (error) {
       console.error("Error sending email:", error);
       toast({

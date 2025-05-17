@@ -3,6 +3,7 @@
 import { toast } from "@/hooks/use-toast";
 import { octokit } from "./octokit";
 import { generateUserOutreachEmail } from "./groq";
+import { sendEmailViaEmailJs } from "./email";
 
 function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
@@ -392,26 +393,21 @@ export const getSearch = async (
 export const generateOutreachEmail = async (
   candidate: Candidate
 ): Promise<string> => {
-  // This would call the Groq API to generate an email
-  // For now we'll just mock the response
-
-  await new Promise((resolve) => setTimeout(resolve, 1500));
-
   const emailTemplate = generateUserOutreachEmail(candidate);
-
   return emailTemplate;
 };
 
 export const sendOutreachEmail = async (
   candidate: Candidate,
-  emailContent: string
+  emailContent: string,
+  recruiterEmail: string
 ): Promise<boolean> => {
-  // This would call the Resend API to send the email
-  // For now we'll just mock the response
-
   try {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
+    await sendEmailViaEmailJs({
+      content: emailContent,
+      recruiter_mail: recruiterEmail,
+      to_email: "tech@madhukm.com", // TODO: Get Github Email from candidate
+    });
     toast({
       title: "Email Sent Successfully",
       description: `Your email to ${candidate.github_username} has been queued for delivery.`,
