@@ -1,73 +1,105 @@
-# Welcome to your Lovable project
 
-## Project info
+# HireAI - Find Top Tech Talent with AI
 
-**URL**: https://lovable.dev/projects/3a5cb691-df2a-4817-b5ca-496513d295ff
+HireAI is a recruiter-facing tool that allows authenticated recruiters to input natural-language job descriptions and receive candidate matches using the GitHub API. The tool supports storing listings, displaying results, and sending personalized outreach emails.
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- **Authentication**: Secure login and registration for recruiters
+- **Natural Language Search**: Enter plain English queries to find candidates
+- **GitHub Integration**: Find matching developers using GitHub's API
+- **AI-Powered Outreach**: Generate personalized outreach emails using GroqCloud LLM
+- **Email Sending**: Send emails directly to candidates via Resend API
+- **Dashboard**: View all search listings and candidate results
 
-**Use Lovable**
+## Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/3a5cb691-df2a-4817-b5ca-496513d295ff) and start prompting.
+- **Frontend**: Vite + React + Tailwind CSS (Single Page App)
+- **Backend & DB**: Supabase (Postgres, Auth, RLS enabled)
+- **AI Provider**: GroqCloud (via OpenAI-compatible API, using Mixtral or Gemma-7B)
+- **Candidate Source**: GitHub Search API
+- **Email Sending**: Resend API
 
-Changes made via Lovable will be committed automatically to this repo.
+## Getting Started
 
-**Use your preferred IDE**
+### Prerequisites
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- Node.js and npm installed
+- A Supabase account and project
+- GroqCloud API account
+- GitHub Personal Access Token
+- Resend API account
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Installation
 
-Follow these steps:
+1. Clone the repository
+   ```bash
+   git clone https://github.com/yourusername/hire-ai.git
+   cd hire-ai
+   ```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+2. Install dependencies
+   ```bash
+   npm install
+   ```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+3. Create a `.env` file based on the `.env.example` file and add your API keys:
+   ```
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   VITE_GITHUB_API_TOKEN=your_github_personal_access_token
+   VITE_GROQ_API_KEY=your_groq_api_key
+   VITE_RESEND_API_KEY=your_resend_api_key
+   VITE_SENDER_EMAIL=your_verified_sender_email@example.com
+   ```
 
-# Step 3: Install the necessary dependencies.
-npm i
+4. Set up your Supabase database using the provided `schema.sql` file:
+   - Go to your Supabase project
+   - Navigate to the SQL Editor
+   - Paste the contents of `schema.sql` and run the script
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+5. Start the development server
+   ```bash
+   npm run dev
+   ```
 
-**Edit a file directly in GitHub**
+## Usage
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1. **Register/Login** to access the dashboard
+2. **Create a New Search** by entering a natural language job description
+3. **View Candidates** that match your search criteria
+4. **Generate Outreach Emails** personalized for each candidate
+5. **Send Emails** directly to candidates
 
-**Use GitHub Codespaces**
+### Example Search Query
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+> "Find senior Gen-AI engineers with LangChain + RAG experience in Europe, open to contract work"
 
-## What technologies are used for this project?
+## Database Schema
 
-This project is built with:
+The application uses the following tables in Supabase:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- `recruiters`: Extends auth.users with additional recruiter metadata
+- `search_listings`: Stores recruiter queries and parsed filters
+- `candidates`: Stores GitHub candidate data linked to search listings
+- `outreach_messages`: Stores outreach emails sent to candidates
 
-## How can I deploy this project?
+## Security
 
-Simply open [Lovable](https://lovable.dev/projects/3a5cb691-df2a-4817-b5ca-496513d295ff) and click on Share -> Publish.
+The application implements Row-Level Security (RLS) in Supabase to ensure:
 
-## Can I connect a custom domain to my Lovable project?
+- Recruiters can only view their own search listings
+- Recruiters can only view candidates from their own searches
+- Recruiters can only view and manage their own outreach messages
 
-Yes, you can!
+## Future Enhancements
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- Candidate response tracking
+- Enhanced filtering and sorting options
+- Email template management
+- Integration with ATS systems
+- Candidate recommendation engine
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
