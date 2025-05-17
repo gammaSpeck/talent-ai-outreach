@@ -114,7 +114,7 @@ const Dashboard = () => {
           <h3 className="text-xl font-semibold mb-4">Create a New Search</h3>
           <p className="text-sm text-gray-600 mb-4">
             Example: "Senior Gen-AI engineers with Bangalore + RAG experience in
-            Europe, open to contract work"
+            Bangalore, open to contract work"
           </p>
 
           <form onSubmit={handleSearch} className="flex gap-2">

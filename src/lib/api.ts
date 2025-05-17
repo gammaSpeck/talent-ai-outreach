@@ -2,6 +2,7 @@
 
 import { toast } from "@/hooks/use-toast";
 import { octokit } from "./octokit";
+import { generateUserOutreachEmail } from "./groq";
 
 function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
@@ -407,37 +408,7 @@ export const generateOutreachEmail = async (
 
   await new Promise((resolve) => setTimeout(resolve, 1500));
 
-  const emailTemplate = `
-Subject: Exciting opportunity for ${
-    candidate.github_username
-  } - Your expertise in ${
-    candidate.bio.includes("LLM") ? "LLMs" : "AI"
-  } is impressive!
-
-Hi there,
-
-I hope this email finds you well. I came across your GitHub profile and was really impressed by your work in ${
-    candidate.bio.includes("LLM")
-      ? "large language models"
-      : "artificial intelligence"
-  } and your contributions to the open-source community.
-
-I'm currently recruiting for a ${
-    candidate.bio.includes("Senior") ? "Senior" : "Lead"
-  } role that aligns perfectly with your expertise in ${
-    candidate.bio.includes("LangChain")
-      ? "LangChain and RAG systems"
-      : "AI engineering"
-  }.
-
-Would you be interested in discussing this opportunity further? If so, I'd love to schedule a brief call to share more details.
-
-Looking forward to your response!
-
-Best regards,
-John Recruiter
-TechHire Inc.
-`;
+  const emailTemplate = generateUserOutreachEmail(candidate);
 
   return emailTemplate;
 };
