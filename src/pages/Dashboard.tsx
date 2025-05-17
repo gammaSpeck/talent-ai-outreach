@@ -4,42 +4,47 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { getUser } from "@/lib/auth";
-import { getSearches, createSearch, SearchListing } from "@/lib/api";
+import { createSearch, getSearches, SearchListing } from "@/lib/api";
 import SearchListingCard from "@/components/SearchListingCard";
+import { useAuthContext } from "@/context/AuthContext";
+import UserMenu from "@/components/UserMenu";
+import AuthModal from "@/components/AuthModal";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const user = getUser();
+  const { user, profile, loading } = useAuthContext();
   const [searchQuery, setSearchQuery] = useState("");
   const [searches, setSearches] = useState<SearchListing[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingSearches, setLoadingSearches] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [pendingSearchQuery, setPendingSearchQuery] = useState<string | null>(null);
 
+  // Load searches when component mounts if user is authenticated
   useEffect(() => {
-    if (!user) {
-      navigate("/login");
-      return;
+    if (!loading && user) {
+      fetchSearches();
+    } else if (!loading && !user) {
+      setLoadingSearches(false);
     }
+  }, [loading, user]);
 
-    const fetchSearches = async () => {
-      try {
-        const data = await getSearches();
-        setSearches(data);
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to load search listings",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSearches();
-  }, [navigate, toast, user]);
+  const fetchSearches = async () => {
+    try {
+      const data = await getSearches();
+      setSearches(data);
+    } catch (error) {
+      console.error("Error fetching searches:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load search listings",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingSearches(false);
+    }
+  };
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,10 +58,21 @@ const Dashboard = () => {
       return;
     }
     
+    // Check if user is authenticated
+    if (!user) {
+      setPendingSearchQuery(searchQuery);
+      setShowAuthModal(true);
+      return;
+    }
+    
+    await executeSearch(searchQuery);
+  };
+
+  const executeSearch = async (query: string) => {
     setIsSearching(true);
     
     try {
-      const newSearch = await createSearch(searchQuery);
+      const newSearch = await createSearch(query);
       setSearches([newSearch, ...searches]);
       setSearchQuery("");
       navigate(`/search/${newSearch.id}`);
@@ -69,12 +85,15 @@ const Dashboard = () => {
       });
     } finally {
       setIsSearching(false);
+      setPendingSearchQuery(null);
     }
   };
 
-  if (!user) {
-    return null;
-  }
+  const handleAuthSuccess = () => {
+    if (pendingSearchQuery) {
+      executeSearch(pendingSearchQuery);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -82,19 +101,20 @@ const Dashboard = () => {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-primary">HireAI</h1>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">Welcome, {user.name}</span>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => {
-                toast({
-                  title: "Logging out...",
-                  description: "Please connect Supabase to enable authentication."
-                });
-              }}
-            >
-              Log out
-            </Button>
+            {user ? (
+              <>
+                {profile && <span className="text-sm text-gray-600 hidden sm:inline">Welcome, {profile.name}</span>}
+                <UserMenu />
+              </>
+            ) : (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setShowAuthModal(true)}
+              >
+                Login / Register
+              </Button>
+            )}
           </div>
         </div>
       </header>
@@ -130,9 +150,20 @@ const Dashboard = () => {
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-xl font-semibold mb-4">Recent Searches</h3>
           
-          {loading ? (
+          {loading || loadingSearches ? (
             <div className="text-center py-8">
               <p className="text-gray-500">Loading searches...</p>
+            </div>
+          ) : !user ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500">Please log in to view your searches.</p>
+              <Button 
+                onClick={() => setShowAuthModal(true)} 
+                variant="outline" 
+                className="mt-4"
+              >
+                Login / Register
+              </Button>
             </div>
           ) : searches.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -148,6 +179,12 @@ const Dashboard = () => {
           )}
         </div>
       </main>
+
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)} 
+        onSuccess={handleAuthSuccess}
+      />
     </div>
   );
 };
