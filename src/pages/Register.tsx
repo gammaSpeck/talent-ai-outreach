@@ -1,9 +1,15 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthContext } from "@/context/AuthContext";
 
@@ -35,7 +41,7 @@ const Register = () => {
         description: "Please check your email for confirmation instructions",
       });
       navigate("/");
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Registration error",
         description: error.message || "Failed to register",
@@ -61,7 +67,7 @@ const Register = () => {
           <h1 className="text-3xl font-bold text-primary">HireAI</h1>
           <p className="text-gray-600 mt-2">Find top tech talent with AI</p>
         </div>
-        
+
         <Card>
           <CardHeader>
             <CardTitle>Create an account</CardTitle>

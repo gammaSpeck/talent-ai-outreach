@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,8 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { createSearch, getSearches, SearchListing } from "@/lib/api";
 import SearchListingCard from "@/components/SearchListingCard";
 import { useAuthContext } from "@/context/AuthContext";
-import UserMenu from "@/components/UserMenu";
-import AuthModal from "@/components/AuthModal";
+import Header from "@/components/Header";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -19,18 +17,11 @@ const Dashboard = () => {
   const [loadingSearches, setLoadingSearches] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [pendingSearchQuery, setPendingSearchQuery] = useState<string | null>(null);
+  const [pendingSearchQuery, setPendingSearchQuery] = useState<string | null>(
+    null
+  );
 
-  // Load searches when component mounts if user is authenticated
-  useEffect(() => {
-    if (!loading && user) {
-      fetchSearches();
-    } else if (!loading && !user) {
-      setLoadingSearches(false);
-    }
-  }, [loading, user]);
-
-  const fetchSearches = async () => {
+  const fetchSearches = useCallback(async () => {
     try {
       const data = await getSearches();
       setSearches(data);
@@ -44,11 +35,20 @@ const Dashboard = () => {
     } finally {
       setLoadingSearches(false);
     }
-  };
+  }, [toast]);
+
+  // Load searches when component mounts if user is authenticated
+  useEffect(() => {
+    if (!loading && user) {
+      fetchSearches();
+    } else if (!loading && !user) {
+      setLoadingSearches(false);
+    }
+  }, [loading, user, fetchSearches]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!searchQuery.trim()) {
       toast({
         title: "Error",
@@ -57,20 +57,20 @@ const Dashboard = () => {
       });
       return;
     }
-    
+
     // Check if user is authenticated
     if (!user) {
       setPendingSearchQuery(searchQuery);
       setShowAuthModal(true);
       return;
     }
-    
+
     await executeSearch(searchQuery);
   };
 
   const executeSearch = async (query: string) => {
     setIsSearching(true);
-    
+
     try {
       const newSearch = await createSearch(query);
       setSearches([newSearch, ...searches]);
@@ -97,41 +97,23 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-primary">HireAI</h1>
-          <div className="flex items-center gap-4">
-            {user ? (
-              <>
-                {profile && <span className="text-sm text-gray-600 hidden sm:inline">Welcome, {profile.name}</span>}
-                <UserMenu />
-              </>
-            ) : (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => setShowAuthModal(true)}
-              >
-                Login / Register
-              </Button>
-            )}
-          </div>
-        </div>
-      </header>
+      <Header onAuthSuccess={handleAuthSuccess} />
 
       <main className="container mx-auto px-4 py-6">
         <div className="mb-8 text-center">
           <h2 className="text-3xl font-bold mb-2">Find Top Tech Talent</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Use natural language to describe the role you're looking to fill,
-            and we'll find the perfect candidates from GitHub's developer community.
+            and we'll find the perfect candidates from GitHub's developer
+            community.
           </p>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
           <h3 className="text-xl font-semibold mb-4">Create a New Search</h3>
           <p className="text-sm text-gray-600 mb-4">
-            Example: "Find senior Gen-AI engineers with LangChain + RAG experience in Europe, open to contract work"
+            Example: "Find senior Gen-AI engineers with LangChain + RAG
+            experience in Europe, open to contract work"
           </p>
           <form onSubmit={handleSearch} className="flex gap-2">
             <Input
@@ -149,17 +131,19 @@ const Dashboard = () => {
 
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-xl font-semibold mb-4">Recent Searches</h3>
-          
+
           {loading || loadingSearches ? (
             <div className="text-center py-8">
               <p className="text-gray-500">Loading searches...</p>
             </div>
           ) : !user ? (
             <div className="text-center py-8">
-              <p className="text-gray-500">Please log in to view your searches.</p>
-              <Button 
-                onClick={() => setShowAuthModal(true)} 
-                variant="outline" 
+              <p className="text-gray-500">
+                Please log in to view your searches.
+              </p>
+              <Button
+                onClick={() => setShowAuthModal(true)}
+                variant="outline"
                 className="mt-4"
               >
                 Login / Register
@@ -179,12 +163,6 @@ const Dashboard = () => {
           )}
         </div>
       </main>
-
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
-        onSuccess={handleAuthSuccess}
-      />
     </div>
   );
 };
