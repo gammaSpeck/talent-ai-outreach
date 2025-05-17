@@ -13,7 +13,7 @@ interface HeaderProps {
 const Header = ({ showBackButton = false, onAuthSuccess }: HeaderProps) => {
   const navigate = useNavigate();
   const { user, profile, loading } = useAuthContext();
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleAuthSuccess = () => {
     if (onAuthSuccess) onAuthSuccess();
@@ -42,11 +42,7 @@ const Header = ({ showBackButton = false, onAuthSuccess }: HeaderProps) => {
               <UserMenu />
             </>
           ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowAuthModal(true)}
-            >
+            <Button variant="outline" size="sm" onClick={() => setIsOpen(true)}>
               Login / Register
             </Button>
           )}
@@ -54,8 +50,8 @@ const Header = ({ showBackButton = false, onAuthSuccess }: HeaderProps) => {
       </div>
 
       <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
         onSuccess={handleAuthSuccess}
       />
     </header>

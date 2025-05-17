@@ -16,7 +16,6 @@ const Dashboard = () => {
   const [searches, setSearches] = useState<SearchListing[]>([]);
   const [loadingSearches, setLoadingSearches] = useState(true);
   const [isSearching, setIsSearching] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
   const [pendingSearchQuery, setPendingSearchQuery] = useState<string | null>(
     null
   );
@@ -48,6 +47,7 @@ const Dashboard = () => {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Search query:", searchQuery);
 
     if (!searchQuery.trim())
       return toast({
@@ -58,9 +58,12 @@ const Dashboard = () => {
 
     // Check if user is authenticated
     if (!user) {
-      setPendingSearchQuery(searchQuery);
-      setShowAuthModal(true);
-      return;
+      // setPendingSearchQuery(searchQuery); // TODO: Implement later
+      return toast({
+        title: "Info",
+        description: "Please login to perform a search",
+        variant: "default",
+      });
     }
 
     await executeSearch(searchQuery);
@@ -110,8 +113,8 @@ const Dashboard = () => {
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
           <h3 className="text-xl font-semibold mb-4">Create a New Search</h3>
           <p className="text-sm text-gray-600 mb-4">
-            Example: "Find senior Gen-AI engineers with LangChain + RAG
-            experience in Europe, open to contract work"
+            Example: "Senior Gen-AI engineers with Bangalore + RAG experience in
+            Europe, open to contract work"
           </p>
 
           <form onSubmit={handleSearch} className="flex gap-2">
@@ -140,13 +143,6 @@ const Dashboard = () => {
               <p className="text-gray-500">
                 Please log in to view your searches.
               </p>
-              <Button
-                onClick={() => setShowAuthModal(true)}
-                variant="outline"
-                className="mt-4"
-              >
-                Login / Register
-              </Button>
             </div>
           ) : searches.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
