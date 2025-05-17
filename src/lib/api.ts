@@ -1,7 +1,7 @@
 // This file will contain all API interactions
 
 import { toast } from "@/hooks/use-toast";
-import { octokit } from "./octokit";
+import { octokit } from "./github";
 import { generateUserOutreachEmail } from "./groq";
 import { sendEmailViaEmailJs } from "./email";
 
@@ -186,6 +186,7 @@ const searchGitHubUsers = async (
         // Create a candidate object
         return {
           id: `github-${user.id}`,
+          email: userDetails.data.email || "",
           github_username: user.login,
           avatar_url: user.avatar_url,
           location: userDetails.data.location || "Location not specified",
@@ -246,6 +247,7 @@ const fetchUserLanguages = async (username: string): Promise<string[]> => {
 // Types
 export interface Candidate {
   id: string;
+  email?: string;
   github_username: string;
   avatar_url: string;
   location: string;
@@ -406,7 +408,7 @@ export const sendOutreachEmail = async (
     await sendEmailViaEmailJs({
       content: emailContent,
       recruiter_mail: recruiterEmail,
-      to_email: "tech@madhukm.com", // TODO: Get Github Email from candidate
+      to_email: candidate.email,
     });
     toast({
       title: "Email Sent Successfully",
