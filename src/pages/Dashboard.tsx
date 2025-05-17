@@ -47,7 +47,6 @@ const Dashboard = () => {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Search query:", searchQuery);
 
     if (!searchQuery.trim())
       return toast({
@@ -75,7 +74,6 @@ const Dashboard = () => {
     try {
       const newSearch = await createSearch(query);
 
-      console.log("New search created:", newSearch);
       setSearches([newSearch, ...searches]);
       setSearchQuery("");
       navigate(`/search/${newSearch.id}`);

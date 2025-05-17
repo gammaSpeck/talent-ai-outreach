@@ -122,14 +122,11 @@ export async function generateUserOutreachEmail(candidate: Candidate) {
     generateChatMsg(msg),
   ];
 
-  console.log("Messages: ", messages);
-
   const completion = await groq.chat.completions.create({
     messages,
     model: "llama-3.3-70b-versatile" as const,
   });
 
   const mail = completion.choices[0].message.content;
-  console.log("Mail: ", mail);
   return mail;
 }

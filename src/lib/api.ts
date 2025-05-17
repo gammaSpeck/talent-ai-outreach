@@ -167,8 +167,6 @@ const searchGitHubUsers = async (
       searchQuery = "developer"; // Default fallback
     }
 
-    console.log("GitHub search query:", searchQuery);
-
     // Search for users
     const result = await octokit.search.users({
       q: searchQuery,
@@ -347,24 +345,15 @@ const parseSearchQuery = (query: string): SearchListing["parsed_query"] => {
 export const createSearch = async (query: string): Promise<SearchListing> => {
   // Parse the query into components using simple pattern matching
   // In a real application, this would use a more sophisticated NLP/LLM approach
-  console.log("Creating search with query:", query);
 
   try {
     // Parse the query using our structured parser
     const parsedQuery = parseSearchQuery(query);
 
-    console.log(
-      "Parsed query structure:",
-      JSON.stringify(parsedQuery, null, 2)
-    );
-
     // Use GitHub API to find real candidates with matching skills
     let candidates: Candidate[] = [];
     try {
       candidates = await searchGitHubUsers(parsedQuery);
-      console.log(
-        `Found ${candidates.length} candidates matching the search criteria`
-      );
     } catch (searchError) {
       console.error("Error searching for candidates:", searchError);
       // Fallback to mock data
