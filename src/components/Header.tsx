@@ -16,9 +16,7 @@ const Header = ({ showBackButton = false, onAuthSuccess }: HeaderProps) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleAuthSuccess = () => {
-    if (onAuthSuccess) {
-      onAuthSuccess();
-    }
+    if (onAuthSuccess) onAuthSuccess();
   };
 
   return (

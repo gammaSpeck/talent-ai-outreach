@@ -49,14 +49,12 @@ const Dashboard = () => {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!searchQuery.trim()) {
-      toast({
+    if (!searchQuery.trim())
+      return toast({
         title: "Error",
         description: "Please enter a search query",
         variant: "destructive",
       });
-      return;
-    }
 
     // Check if user is authenticated
     if (!user) {
@@ -73,6 +71,8 @@ const Dashboard = () => {
 
     try {
       const newSearch = await createSearch(query);
+
+      console.log("New search created:", newSearch);
       setSearches([newSearch, ...searches]);
       setSearchQuery("");
       navigate(`/search/${newSearch.id}`);
@@ -90,9 +90,7 @@ const Dashboard = () => {
   };
 
   const handleAuthSuccess = () => {
-    if (pendingSearchQuery) {
-      executeSearch(pendingSearchQuery);
-    }
+    if (pendingSearchQuery) executeSearch(pendingSearchQuery);
   };
 
   return (
@@ -115,6 +113,7 @@ const Dashboard = () => {
             Example: "Find senior Gen-AI engineers with LangChain + RAG
             experience in Europe, open to contract work"
           </p>
+
           <form onSubmit={handleSearch} className="flex gap-2">
             <Input
               value={searchQuery}
