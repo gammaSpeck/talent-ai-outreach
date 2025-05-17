@@ -106,6 +106,11 @@ const Dashboard = () => {
             and we'll find the perfect candidates from GitHub's developer
             community.
           </p>
+          <p className="text-amber-600 text-sm mt-2 font-medium max-w-2xl mx-auto">
+            NOTE: This is a demo MVP app, and the locations that it
+            will search for are Bangalore, Mumbai, Delhi, Chennai, Pune,
+            Hyderabad, & India.
+          </p>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">

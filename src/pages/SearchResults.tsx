@@ -87,6 +87,7 @@ const SearchResults = () => {
   }, [id, navigate, toast, user, authLoading]);
 
   const handleGenerateEmail = async (candidate: Candidate) => {
+    if (!candidate.email) return;
     setSelectedCandidate(candidate);
     setIsGeneratingEmail(true);
 
@@ -304,6 +305,7 @@ const SearchResults = () => {
                             Outreach
                           </Button>
                         </DialogTrigger>
+
                         <DialogContent className="max-w-2xl">
                           <DialogHeader>
                             <DialogTitle>Outreach Email</DialogTitle>
